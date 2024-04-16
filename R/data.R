@@ -33,4 +33,4 @@
 "atlas_economic_complexity"
 
 #' Atlas of Economic Complexity Colours
-"complexity_colours"
+"complexity_classification"

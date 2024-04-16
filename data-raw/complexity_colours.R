@@ -28,4 +28,4 @@ complexity_classification <- read_tsv("data-raw/misc/complexity_classification.t
 
 
 
-usethis::use_data(complexity_colours, overwrite = TRUE)
+usethis::use_data(complexity_classification, overwrite = TRUE)
