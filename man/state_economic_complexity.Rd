@@ -5,7 +5,7 @@
 \alias{state_economic_complexity}
 \title{Australian State Economic Complexity data}
 \format{
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 226289 rows and 8 columns.
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 226289 rows and 11 columns.
 }
 \usage{
 state_economic_complexity

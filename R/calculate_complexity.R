@@ -4,19 +4,24 @@
 #' @param region  variable in `data` which corresponds to a region.
 #' @param product variable in `data` which corresponds to a product.
 #' @param value variable in `data` which corresponds to a value.
+#' @param year year to calculate complexity indicators.
 #'
 #' @return dataframe
 #' @export
 #'
-#' @examples \notrun{
+#' @examples \dontrun{
 #'
-#' calculate_complexity(state_data, region = "location_code", product = "hs_product_code", value = "export_value", year = 1996)
+#' calculate_complexity(state_data,
+#' region = "location_code",
+#' product = "hs_product_code",
+#' value = "export_value",
+#' year = 1996)
 #'
 #' }
 calculate_complexity <- function(data, region, product, value, year) {
 
   data <- data |>
-    filter(year == {{year}})
+    dplyr::filter(year == {{year}})
 
   matrix_to_df <- function(matrix, region, product, values_to) {
 
@@ -61,7 +66,7 @@ calculate_complexity <- function(data, region, product, value, year) {
 #' Calculate economic complexity indicators for multiple years
 #'
 #' @param data data suitable for calculating complexity.
-#' @param year years to calculate complexity indicators.
+#' @param years years to calculate complexity indicators.
 #' @param region  variable in `data` which corresponds to a region.
 #' @param product variable in `data` which corresponds to a product.
 #' @param value variable in `data` which corresponds to a value.
@@ -69,7 +74,15 @@ calculate_complexity <- function(data, region, product, value, year) {
 #' @return dataframe
 #' @export
 #'
-#' @examples
+#' @examples \dontrun{
+#'
+#' calculate_complexity_time_series(state_data,
+#' years = unique(state_data$year),
+#' region = "location_code",
+#' product = "hs_product_code",
+#' value = "export_value")
+#'
+#' }
 calculate_complexity_time_series <- function(data, years, region, product, value) {
   purrr::map(.x = years,
              .f = ~calculate_complexity(data, region = {{region}}, product = {{product}}, value = {{value}}, year = .x),
