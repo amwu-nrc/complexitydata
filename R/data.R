@@ -16,3 +16,14 @@
 #' @source <https://www.qgso.qld.gov.au/statistics/theme/economy/international-trade/exports>
 #'
 "combined_exports"
+
+#' Australian State services data
+"state_service_data"
+
+#' Australian State Economic Complexity data
+#'
+"state_economic_complexity"
+
+#' Atlas of Economic Complexity Product Complexity Index
+#'
+"atlas_pci"
