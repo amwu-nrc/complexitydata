@@ -28,9 +28,5 @@
 #'
 "atlas_pci"
 
-#' Atlas of Economic Complexity 4-digit Data
-#'
-"atlas_economic_complexity"
-
 #' Atlas of Economic Complexity Colours
 "complexity_classification"

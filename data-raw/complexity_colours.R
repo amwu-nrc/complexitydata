@@ -20,7 +20,7 @@ complexity_colours <- tribble(
 ) |>
   mutate(colour = paste0("#", colour))
 
-complexity_classification <- read_tsv("data-raw/misc/complexity_classification.txt",
+complexity_classification <- read_csv("data-raw/misc/complexity_classifications.csv",
                                       show_col_types = FALSE) |>
   mutate(code = str_pad(Code, "left", pad = "0", width = 4)) |>
   select(code, sector = Sector) |>

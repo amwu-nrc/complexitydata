@@ -5,7 +5,7 @@
 \alias{complexity_classification}
 \title{Atlas of Economic Complexity Colours}
 \format{
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 1160 rows and 3 columns.
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 1217 rows and 3 columns.
 }
 \usage{
 complexity_classification
