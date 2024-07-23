@@ -1,0 +1,43 @@
+## code to prepare `employment-complexity` dataset goes here
+library(rlang)
+
+
+
+employment_complexity <- function(data, region, activity, digits, remove_totals = TRUE) {
+
+
+  region_name <- paste({{region}}, "(POW)")
+
+  activity_name <- switch(activity,
+                     "indp" = "INDP Industry of Employment",
+                     "occp" = "OCCP Occupation")
+  activity_name <- paste0(digits, "-digit level ", activity_name)
+
+  nmax <- suppressWarnings(min(which(is.na(readr::read_csv(name_repair = 'unique_quiet',data, show_col_types = F,skip = 9)$Count)))-1)
+
+  region <- tolower(region)
+
+  df <- readr::read_csv(data,
+                        skip = 9,
+                        n_max = nmax,
+                        show_col_types = FALSE,
+                        name_repair = 'unique_quiet') |>
+    dplyr::select({{region}} := region_name,
+                  {{activity}} := activity_name,
+                  count = Count)  |>
+    dplyr::filter(.data[[region]] != "Total",
+                  !.data[[activity]] %in% c("Inadequately described", "Not stated", "Not applicable", "Total"))
+
+  return(df)
+}
+
+
+
+
+# sa3 ---------------------------------------------------------------------
+
+sa3_occp4 <- employment_complexity("data-raw/abs/sa3-pow-occp-4-digit.csv", region = "SA3", activity = "occp", digits = 4)
+sa3_indp4 <- employment_complexity("data-raw/abs/sa3-pow-indp-4-digit.csv", region = "SA3", activity = "indp", digits = 4)
+
+
+usethis::use_data(sa3_indp4, sa3_occp4, overwrite = TRUE, compress = "xz")
