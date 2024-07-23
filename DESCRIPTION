@@ -4,20 +4,21 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Hamish", "Gamble", , "hamish.gamble@flinders.edu.au", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-1277-1227"))
-Description: Package contains Economic Complexity data for Australian States and other supporting datasets.
+Description: Package contains Economic Complexity data for Australian
+    States and other supporting datasets.
 License: MIT + file LICENSE
-Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
-Depends: 
-    R (>= 4.0)
-LazyData: true
-LazyDataCompression: xz
 URL: https://github.com/aiti-flinders/complexitydata
 BugReports: https://github.com/aiti-flinders/complexitydata/issues
+Depends: 
+    R (>= 4.0)
 Imports: 
     dplyr,
     economiccomplexity,
     purrr,
     tibble,
     tidyr
+Encoding: UTF-8
+LazyData: true
+LazyDataCompression: xz
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2.9000

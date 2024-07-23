@@ -28,5 +28,17 @@
 #'
 "atlas_pci"
 
-#' Atlas of Economic Complexity Colours
+#' Atlas of Economic Complexity Classification
 "complexity_classification"
+
+#' Atlas of Economic Complexity Colours
+"complexity_colours"
+
+#' Atlas of Economic Complexity Economic Complexity Index
+"atlas_eci"
+
+#' ABS Employment by Industry (SA3, 4-digit Industry)
+"sa3_indp4"
+
+#' ABS Employment by Occupation (SA3, 4-digit Occupation)
+"sa3_occp4"

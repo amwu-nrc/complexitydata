@@ -3,7 +3,7 @@
 \docType{data}
 \name{complexity_classification}
 \alias{complexity_classification}
-\title{Atlas of Economic Complexity Colours}
+\title{Atlas of Economic Complexity Classification}
 \format{
 An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 1217 rows and 3 columns.
 }
@@ -11,6 +11,6 @@ An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) w
 complexity_classification
 }
 \description{
-Atlas of Economic Complexity Colours
+Atlas of Economic Complexity Classification
 }
 \keyword{datasets}
