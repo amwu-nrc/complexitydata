@@ -27,6 +27,7 @@ employment_complexity <- function(data, region, activity, digits, remove_totals 
                   {{activity}} := activity_name,
                   count = Count)  |>
     dplyr::filter(.data[[region]] != "Total",
+                  !str_detect(.data[[region]], "POW|Migratory"),
                   !.data[[activity]] %in% c("Inadequately described", "Not stated", "Not applicable", "Total"))
 
   return(df)
