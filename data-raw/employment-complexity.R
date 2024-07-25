@@ -34,6 +34,20 @@ employment_complexity <- function(data, region, activity, digits, remove_totals 
 }
 
 
+# sa2 ---------------------------------------------------------------------
+
+sa2_indp1_occp1 <- read_csv("data-raw/abs/sa2-pow-occp-indp-1-digit.csv.csv",
+                            skip = 9,
+                            n_max = 625922,
+                            col_select = c(sa2 = "SA2 (POW)",
+                                           anzsic_division = "1-digit level INDP Industry of Employment",
+                                           anzsco_major = "1-digit level OCCP Occupation",
+                                           count = Count)) |>
+  filter(!anzsic_division %in% c("Inadequately described", "Not stated",
+                                 "Not applicable", "Total"),
+         !anzsco_major %in% c("Inadequately described", "Not stated",
+                              "Not applicable", "Total"),
+         sa2 != "Total")
 
 
 # sa3 ---------------------------------------------------------------------
@@ -54,4 +68,4 @@ sa3_occp4 <- employment_complexity("data-raw/abs/sa3-pow-occp-4-digit.csv", regi
 sa3_indp4 <- employment_complexity("data-raw/abs/sa3-pow-indp-4-digit-codes.csv", region = "SA3", activity = "indp", digits = 4)
 
 
-usethis::use_data(sa3_indp1_occp1, sa3_indp4, sa3_occp4, overwrite = TRUE, compress = "xz")
+usethis::use_data(sa2_indp1_occp1, sa3_indp1_occp1, sa3_indp4, sa3_occp4, overwrite = TRUE, compress = "xz")
