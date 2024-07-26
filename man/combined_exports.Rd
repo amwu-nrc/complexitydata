@@ -5,15 +5,12 @@
 \alias{combined_exports}
 \title{Atlas of Economic Complexity and Australian State export data}
 \format{
-\subsection{\code{combined_exports}}{
-
-A data frame with 4,667,908 rows and 4 columns:
+Tibble with columns:
 \describe{
-\item{year}{Year}
-\item{location_code}{3 letter ISO country code}
-\item{hs_product_code}{4 digit HS1992 product code}
-\item{export_value}{Export value, $US}
-}
+\item{year}{Year that product was exported.}
+\item{location_code}{3 letter ISO country code.}
+\item{hs_product_code}{4 digit HS1992 product code. }
+\item{export_value}{Export value in US dollars.}
 }
 }
 \source{

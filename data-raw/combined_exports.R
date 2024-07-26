@@ -1,4 +1,4 @@
-## code to prepare `state_global_export_data` dataset goes here
+## code to prepare `combined_exports` dataset goes here
 library(dplyr)
 library(tidyr)
 library(readr)

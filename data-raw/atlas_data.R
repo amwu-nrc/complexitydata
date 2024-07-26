@@ -11,7 +11,13 @@ usethis::use_data(atlas_pci, overwrite = TRUE, compress = "xz")
 
 
 atlas_eci <- country_hsproduct4digit_year |>
-  distinct(year, loction_code, eci)
+  distinct(year, location_code, hs_eci)
 
 usethis::use_data(atlas_eci, overwrite = TRUE, compress = "xz")
+
+
+atlas_economic_complexity <- country_hsproduct4digit_year |>
+  select(year, export_value, location_code, hs_product_code)
+
+usethis::use_data(atlas_economic_complexity, compress = "xz", overwrite = TRUE)
 

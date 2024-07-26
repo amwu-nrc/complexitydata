@@ -3,6 +3,7 @@ library(stringr)
 library(dplyr)
 library(strayr)
 library(devtools)
+library(ecomplexity)
 
 load_all()
 

@@ -3,7 +3,11 @@
 \docType{data}
 \name{state_economic_complexity}
 \alias{state_economic_complexity}
-\title{Australian State Economic Complexity data}
+\title{Australian State Economic Complexity data
+Economic Complexity data for Australian states and Northern Territory.
+Complexity indicators are calculated using the full data set \code{\link{combined_exports}}
+As such these indicators compare Australian states and the NT with the 133 countries
+Included in the Atlas of Economic Complexity. The included countries can be seen in \code{\link{atlas_countries}}}
 \format{
 An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 226289 rows and 11 columns.
 }
@@ -12,5 +16,9 @@ state_economic_complexity
 }
 \description{
 Australian State Economic Complexity data
+Economic Complexity data for Australian states and Northern Territory.
+Complexity indicators are calculated using the full data set \code{\link{combined_exports}}
+As such these indicators compare Australian states and the NT with the 133 countries
+Included in the Atlas of Economic Complexity. The included countries can be seen in \code{\link{atlas_countries}}
 }
 \keyword{datasets}

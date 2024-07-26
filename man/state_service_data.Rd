@@ -3,14 +3,44 @@
 \docType{data}
 \name{state_service_data}
 \alias{state_service_data}
-\title{Australian State services data}
+\title{Australian State and territory services data}
 \format{
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 920 rows and 4 columns.
+Tibble with columns
+\describe{
+\item{location_code}{Abbreviated state/territory name.}
+\item{year}{Year the service was exported. Data covers the period between 1999 and 2021.}
+\item{hs_product_code}{Aggregated EBOPS service categories.
+Categories include communications, insurance and finance, transportation, travel and other.}
+\item{export_value}{Export value in Australian dollars.}
+}
+}
+\source{
+Australian Bureau of Statistics, International Trade: Supplementary Information, Financial Year
+\url{https://www.abs.gov.au/statistics/economy/international-trade/international-trade-supplementary-information-financial-year/2022-23}
 }
 \usage{
 state_service_data
 }
 \description{
-Australian State services data
+Services data for Australian states and territories. From the ABS international trade supplementary information release
+Table 3. International trade in services, credits, state by financial year, $m
+}
+\details{
+\subsection{Conversion between ABS service categories and EBOPS categories}{\tabular{ll}{
+   ABS Category \tab EBOPS \cr
+   Manufacturing services on physical inputs owned by others \tab Other \cr
+   Maintenance and repair services n.i.e \tab Other \cr
+   Transport \tab Transport \cr
+   Travel \tab Travel \cr
+   Construction \tab Other \cr
+   Insurance and Pension Services \tab Financial \cr
+   Charges for the use of intellectual property n.i.e \tab Other \cr
+   Telecommunications, computer and information services \tab ICT \cr
+   Other Business Services \tab Other \cr
+   Personal, Cultural, and Recreational Services \tab Other \cr
+   Government Goods and Services n.i.e \tab Other \cr
+}
+
+}
 }
 \keyword{datasets}
