@@ -5,7 +5,7 @@
 \alias{sa3_indp4}
 \title{ABS Employment by Industry (SA3, 4-digit Industry)}
 \format{
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 257403 rows and 3 columns.
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 244800 rows and 3 columns.
 }
 \usage{
 sa3_indp4
