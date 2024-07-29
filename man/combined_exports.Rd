@@ -22,8 +22,15 @@ Tibble with columns:
 combined_exports
 }
 \description{
+Atlas of Economic Complexity and Australian State export data
+}
+\details{
 Atlas of Economic complexity data with Australia removed and replaced by
 Australian State export data. State export data has been converted from the AHECC
 system to the Harmonised System (1992 version)
+
+Economic complexity indicators provided by the Atlas of Economic Complexity will not align with the indicators included in this dataset.
+This is due in part to the inclusion of the state export data and exclusion of Australia. However, export data provided by the Atlas of Economic
+Complexity dataverse undergoes additional pre-processing before the indicators are calculated (see: \url{https://github.com/cid-harvard/py-ecomplexity/issues/21})
 }
 \keyword{datasets}

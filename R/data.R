@@ -1,8 +1,15 @@
 #' Atlas of Economic Complexity and Australian State export data
 #'
+#' @details
+#'
 #' Atlas of Economic complexity data with Australia removed and replaced by
 #' Australian State export data. State export data has been converted from the AHECC
 #' system to the Harmonised System (1992 version)
+#'
+#' Economic complexity indicators provided by the Atlas of Economic Complexity will not align with the indicators included in this dataset.
+#' This is due in part to the inclusion of the state export data and exclusion of Australia. However, export data provided by the Atlas of Economic
+#' Complexity dataverse undergoes additional pre-processing before the indicators are calculated (see: \url{https://github.com/cid-harvard/py-ecomplexity/issues/21})
+#'
 #'
 #' @format Tibble with columns:
 #' \describe{
@@ -50,10 +57,31 @@
 "state_service_data"
 
 #' Australian State Economic Complexity data
+
+#' @format Tibble with columns:
+#' \describe{
+#' \item{year}
+#' \item{location_code}{3-digit ISO country code and short Australian state identifier. See [`atlas_countries`].}
+#' \item{hs_product_code}{4-digit Harmonised System 1992 product code}
+#' \item{export_value}{Export value in US dollars}
+#' \item{rca}{Revealed comparative advantage. An RCA greater than or equal to 1 indicates that the product is 'present' in that countries export basket.}
+#' \item{product_complexity_index}{Standardised product complexity index}
+#' \item{country_complexity_index}{Standardised country complexity index}
+#' \item{complexity_outlook_index}{Standardised potential for country complexity to increase}
+#' \item{cog}{Complexity outlook gain.
+#' Benefit to the country in terms of increased opportunities to diversify into more complex products from developing
+#' a specialisation in the product}
+#' \item{density}{How "near" the product is to the existing set of capabilities in the country}
+#' \item{eci_rank}{Within year rank of the countries economic complexity index}
+#' }
+#'
+#' @details
 #' Economic Complexity data for Australian states and Northern Territory.
 #' Complexity indicators are calculated using the full data set [`combined_exports`]
 #' As such these indicators compare Australian states and the NT with the 133 countries
 #' Included in the Atlas of Economic Complexity. The included countries can be seen in [`atlas_countries`]
+#'
+#'
 "state_economic_complexity"
 
 #' Atlas of Economic Complexity Countries.
