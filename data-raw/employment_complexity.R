@@ -47,7 +47,7 @@ sa2_indp1_occp1 <- read_csv("data-raw/abs/sa2-pow-occp-indp-1-digit.csv.csv",
                                  "Not applicable", "Total"),
          !anzsco_major %in% c("Inadequately described", "Not stated",
                               "Not applicable", "Total"),
-         sa2 != "Total")
+         !str_detect(sa2, "Total|POW|Migratory"))
 
 
 # sa3 ---------------------------------------------------------------------
@@ -62,7 +62,7 @@ sa3_indp1_occp1 <- read_csv("data-raw/abs/sa3-pow-occp-indp-1-digit.csv",
                                  "Not applicable", "Total"),
          !anzsco_major %in% c("Inadequately described", "Not stated",
                               "Not applicable", "Total"),
-         sa3 != "Total")
+         !str_detect(sa3, "Total|POW|Migratory"))
 
 sa3_indp2_occp1 <- read_csv("data-raw/abs/sa3-pow-indp-2-occp-1-digit.csv",
                             skip = 9,
@@ -73,7 +73,7 @@ sa3_indp2_occp1 <- read_csv("data-raw/abs/sa3-pow-indp-2-occp-1-digit.csv",
                                            count = Count)) |>
   filter(!anzsic_subdivision %in% c("Inadequately described", "Not stated", "Not applicable", "Total"),
          !anzsco_major %in% c("Inadequately described", "Not stated", "Not applicable", "Total"),
-         sa3 != "Total")
+         !str_detect(sa3, "Total|POW|Migratory"))
 
 sa3_occp4 <- employment_complexity("data-raw/abs/sa3-pow-occp-4-digit.csv", region = "SA3", activity = "occp", digits = 4)
 sa3_indp4 <- employment_complexity("data-raw/abs/sa3-pow-indp-4-digit-codes.csv", region = "SA3", activity = "indp", digits = 4)
@@ -85,3 +85,4 @@ usethis::use_data(sa2_indp1_occp1,
                   sa3_indp4,
                   sa3_occp4,
                   overwrite = TRUE, compress = "xz")
+devtools::document()

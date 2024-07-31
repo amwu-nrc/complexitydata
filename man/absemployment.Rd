@@ -12,13 +12,13 @@
 \format{
 Tibble with columns
 
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 375896 rows and 4 columns.
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 373008 rows and 4 columns.
 
 An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 244800 rows and 3 columns.
 
 An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 161160 rows and 3 columns.
 
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 301560 rows and 4 columns.
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 285600 rows and 4 columns.
 }
 \usage{
 sa3_indp1_occp1
