@@ -47,7 +47,13 @@ sa2_indp1_occp1 <- read_csv("data-raw/abs/sa2-pow-occp-indp-1-digit.csv.csv",
                                  "Not applicable", "Total"),
          !anzsco_major %in% c("Inadequately described", "Not stated",
                               "Not applicable", "Total"),
-         !str_detect(sa2, "Total|POW|Migratory"))
+         !str_detect(sa2, "Total|POW|Migratory")) |>
+  mutate(anzsic_division = fct_inorder(anzsic_division),
+         anzsco_major = fct_inorder(anzsco_major),
+         industry_occupation = paste0(anzsic_division, " (", anzsco_major,")"),
+         industry_occupation = fct_inorder(industry_occupation)) |>
+  group_by(sa2, industry_occupation) |>
+  summarise(count = sum(count), .groups = "drop")
 
 
 # sa3 ---------------------------------------------------------------------
@@ -62,7 +68,13 @@ sa3_indp1_occp1 <- read_csv("data-raw/abs/sa3-pow-occp-indp-1-digit.csv",
                                  "Not applicable", "Total"),
          !anzsco_major %in% c("Inadequately described", "Not stated",
                               "Not applicable", "Total"),
-         !str_detect(sa3, "Total|POW|Migratory"))
+         !str_detect(sa3, "Total|POW|Migratory")) |>
+  mutate(anzsic_division = fct_inorder(anzsic_division),
+         anzsco_major = fct_inorder(anzsco_major),
+         industry_occupation = paste0(anzsic_division, " (", anzsco_major,")"),
+         industry_occupation = fct_inorder(industry_occupation)) |>
+  group_by(sa3, industry_occupation) |>
+  summarise(count = sum(count), .groups = "drop")
 
 sa3_indp2_occp1 <- read_csv("data-raw/abs/sa3-pow-indp-2-occp-1-digit.csv",
                             skip = 9,
@@ -73,7 +85,13 @@ sa3_indp2_occp1 <- read_csv("data-raw/abs/sa3-pow-indp-2-occp-1-digit.csv",
                                            count = Count)) |>
   filter(!anzsic_subdivision %in% c("Inadequately described", "Not stated", "Not applicable", "Total"),
          !anzsco_major %in% c("Inadequately described", "Not stated", "Not applicable", "Total"),
-         !str_detect(sa3, "Total|POW|Migratory"))
+         !str_detect(sa3, "Total|POW|Migratory")) |>
+  mutate(anzsic_subdivision = fct_inorder(anzsic_subdivision),
+         anzsco_major = fct_inorder(anzsco_major),
+         industry_occupation = paste0(anzsic_subdivision, " (", anzsco_major,")"),
+         industry_occupation = fct_inorder(industry_occupation)) |>
+  group_by(sa3, industry_occupation) |>
+  summarise(count = sum(count), .groups = "drop")
 
 sa3_occp4 <- employment_complexity("data-raw/abs/sa3-pow-occp-4-digit.csv", region = "SA3", activity = "occp", digits = 4)
 sa3_indp4 <- employment_complexity("data-raw/abs/sa3-pow-indp-4-digit-codes.csv", region = "SA3", activity = "indp", digits = 4)
