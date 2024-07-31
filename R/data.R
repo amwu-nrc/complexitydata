@@ -102,14 +102,23 @@
 #' Atlas of Economic Complexity Economic Complexity Index
 "atlas_eci"
 
-#' ABS Employment by Industry by Occupation (SA3, 1-digit Industry, 1-digit Occupation)
+#' ABS Employment Data
+#'
+#' @name absemployment
+#' @format Tibble with columns
 "sa3_indp1_occp1"
 
 #' ABS Employment by Industry by Occupation (SA2, 1-digit Industry, 1-digit Occupation)
+#' @rdname absemployment
 "sa2_indp1_occp1"
 
 #' ABS Employment by Industry (SA3, 4-digit Industry)
+#' @rdname absemployment
 "sa3_indp4"
 
 #' ABS Employment by Occupation (SA3, 4-digit Occupation)
+#' @rdname absemployment
 "sa3_occp4"
+
+#' @rdname absemployment
+"sa3_indp2_occp1"
