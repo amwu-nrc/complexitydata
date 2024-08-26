@@ -57,10 +57,10 @@
 "state_service_data"
 
 #' Australian State Economic Complexity data
-
+#'
 #' @format Tibble with columns:
 #' \describe{
-#' \item{year}
+#' \item{year}{calendar year}
 #' \item{location_code}{3-digit ISO country code and short Australian state identifier. See [`atlas_countries`].}
 #' \item{hs_product_code}{4-digit Harmonised System 1992 product code}
 #' \item{export_value}{Export value in US dollars}
@@ -80,8 +80,7 @@
 #' Complexity indicators are calculated using the full data set [`combined_exports`]
 #' As such these indicators compare Australian states and the NT with the 133 countries
 #' Included in the Atlas of Economic Complexity. The included countries can be seen in [`atlas_countries`]
-#'
-#'
+
 "state_economic_complexity"
 
 #' Atlas of Economic Complexity Countries.

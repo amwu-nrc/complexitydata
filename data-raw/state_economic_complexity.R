@@ -7,8 +7,9 @@ library(ecomplexity)
 
 load_all()
 
-# ACT is removed due to insufficient export value
+#ACT is removed due to insufficient export value
 data("combined_exports")
+
 state_data <- combined_exports |>
   filter(location_code != "ACT")
 
