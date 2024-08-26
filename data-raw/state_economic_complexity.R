@@ -7,8 +7,9 @@ library(ecomplexity)
 
 load_all()
 
-# ACT is removed due to insufficient export value
+#ACT is removed due to insufficient export value
 data("combined_exports")
+
 state_data <- combined_exports |>
   filter(location_code != "ACT")
 
@@ -24,7 +25,7 @@ complexity_rank <- economic_complexity |>
 
 state_economic_complexity <- economic_complexity |>
   left_join(complexity_rank , by = join_by(year, location_code, country_complexity_index)) |>
-  filter(location_code %in% str_to_upper(clean_state(1:8)))
+  filter(location_code %in% clean_state(1:8))
 
 
 usethis::use_data(state_economic_complexity, compress = "xz", overwrite = TRUE)
