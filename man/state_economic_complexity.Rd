@@ -7,7 +7,7 @@
 \format{
 Tibble with columns:
 \describe{
-\item{year}
+\item{year}{calendar year}
 \item{location_code}{3-digit ISO country code and short Australian state identifier. See \code{\link{atlas_countries}}.}
 \item{hs_product_code}{4-digit Harmonised System 1992 product code}
 \item{export_value}{Export value in US dollars}

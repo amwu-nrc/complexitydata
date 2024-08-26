@@ -1,18 +1,13 @@
 ## code to prepare `combined_exports` dataset goes here
+library(readxl)
+library(readr)
+library(stringr)
+library(strayr)
 library(dplyr)
 library(tidyr)
-library(readr)
-library(lubridate)
-library(stringr)
+library(cli)
 library(purrr)
-
-
-
-years <- list.files("data-raw/state_export_data")
-years <- years[str_detect(years, ".csv")]
-
-#Not interested in 2021-22 data yet
-years <- years[years != "2021-22.csv"]
+library(lubridate)
 
 hs_92_92 <- read_csv("data-raw/concordance/hs92_to_hs92.csv",
                      col_types = list(h3 = "c", h0 = "c")) |>
@@ -57,46 +52,53 @@ df_states <- tibble(
   "WA" = numeric()
 )
 
-ahecc_to_hs <- function(year) {
+df <- read_excel("data-raw/state_export_data/abs_calendar_year_request.xlsx",
+                 sheet = "Table 1",
+                 skip = 7,
+                 n_max = 802034,
+                 col_names = c("year", "ahecc_8", "ahecc_description", "state", "fob_aud")) |>
+  mutate(year = as.integer(str_extract(year, "[0-9]*")),
+         state = case_when(
+           state == "Re-exports" ~ "RX",
+           state == "No state details" ~ "CND",
+           TRUE ~ clean_state(state)
+           ),
+         ahecc_8 = str_pad(ahecc_8, width = 8, side = "left", pad = "0"),
+         ahecc_6 = str_sub(ahecc_8, 0L, 6L)) |>
+  filter(ahecc_8 != "98888888") |>  #Can't find any information about this code.
+  pivot_wider(names_from = state, values_from = fob_aud, values_fill = 0)
+
+ahecc_to_hs <- function(data, year) {
   #Read the state data for a year
-  df <- read_csv(paste0("data-raw/state_export_data/", year),
-                 show_col_types = FALSE) |>
-    rename(AHECC_8 = 1,
-           CND = 3,
-           FRX = 4,
-           QLD = 7,
-           TAS = 9,
-           VIC = 10,
-           TOT = 12) |>
-    separate(AHECC_8, into = c("AHECC", "AHECC_DESC"), sep = 8) |>
-    mutate(AHECC_DESC = trimws(AHECC_DESC),
-           AHECC_6 = str_sub(AHECC, 0L, 6L))
+
+  cli_alert("Converting data for {year}")
+
+  df <- data |>
+    filter(year == {{year}})
 
   # #Merge with the concordance, group by hs, summarise
-  df_hs <- left_join(df, hs_92_92, by = c("AHECC_6" = "h3"))
+  df_hs <- left_join(df, hs_92_92, by = c("ahecc_6" = "h3"))
 
   err <- sum(is.na(df_hs$h0))
 
   while (err > 0) {
 
-    print(year)
 
     missing <- df_hs |>
       filter(is.na(h0))  |>
-      pull(AHECC_6)
+      pull(ahecc_6)
 
     new_concordance <- bind_rows(
       hs_92_92,
       hs_96_92[hs_96_92$h3 %in% missing, ])
 
-    df_hs <- left_join(df, new_concordance, by = c("AHECC_6" = "h3"))
+    df_hs <- left_join(df, new_concordance, by = c("ahecc_6" = "h3"))
 
     missing <- df_hs |>
       filter(is.na(h0))  |>
-      pull(AHECC_6)
+      pull(ahecc_6)
 
     err <- length(missing) #Check if the addition of 96-92 codes solved the problem. If err == 0 the loop ends
-    print(err)
 
     #96-92 not enough, so add in the 02-92
     new_concordance <- bind_rows(
@@ -104,14 +106,13 @@ ahecc_to_hs <- function(year) {
       hs_02_92[hs_02_92$h3 %in% missing, ]) |>
       distinct()
 
-    df_hs <- left_join(df, new_concordance, by = c("AHECC_6" = "h3"))
+    df_hs <- left_join(df, new_concordance, by = c("ahecc_6" = "h3"))
 
     missing <- df_hs |>
       filter(is.na(h0))  |>
-      pull(AHECC_6)
+      pull(ahecc_6)
 
     err <- length(missing) #Check if the addition of 02-92 solved the problem. If err == 0, the loop ends
-    print(err)
 
     #02-92 and 96-92 not enough! so add in the 07-92
     new_concordance <- bind_rows(
@@ -119,14 +120,13 @@ ahecc_to_hs <- function(year) {
       hs_07_92[hs_07_92$h3 %in% missing, ])  |>
       distinct()
 
-    df_hs <- left_join(df, new_concordance, by = c("AHECC_6" = "h3"))
+    df_hs <- left_join(df, new_concordance, by = c("ahecc_6" = "h3"))
 
     missing <- df_hs |>
       filter(is.na(h0))  |>
-      pull(AHECC_6)
+      pull(ahecc_6)
 
     err <- length(missing)
-    print(err)
 
 
     new_concordance <- bind_rows(
@@ -134,14 +134,13 @@ ahecc_to_hs <- function(year) {
       hs_12_92[hs_12_92$h3 %in% missing, ]) |>
       distinct()
 
-    df_hs <- left_join(df, new_concordance, by = c("AHECC_6" = "h3"))
+    df_hs <- left_join(df, new_concordance, by = c("ahecc_6" = "h3"))
 
     missing <- df_hs  |>
       filter(is.na(h0))  |>
-      pull(AHECC_6)
+      pull(ahecc_6)
 
     err <- length(missing)
-    print(err)
 
 
     #if this doesnt work, will need a newer concordance
@@ -149,14 +148,13 @@ ahecc_to_hs <- function(year) {
       new_concordance,
       hs_17_92[hs_17_92$h3 %in% missing, ])  |> distinct()
 
-    df_hs <- left_join(df, new_concordance, by = c("AHECC_6" = "h3"))
+    df_hs <- left_join(df, new_concordance, by = c("ahecc_6" = "h3"))
 
     missing <- df_hs |>
       filter(is.na(h0))  |>
-      pull(AHECC_6)
+      pull(ahecc_6)
 
     err <- length(missing)
-    print(err)
 
 
     #Add 2022 to 1992 concordance
@@ -164,35 +162,107 @@ ahecc_to_hs <- function(year) {
       new_concordance,
       hs_22_92[hs_22_92$h3 %in% missing, ]) |> distinct()
 
-    df_hs <- left_join(df, new_concordance, by = c("AHECC_6" = "h3"))
+    df_hs <- left_join(df, new_concordance, by = c("ahecc_6" = "h3"))
 
     missing <- df_hs |>
       filter(is.na(h0)) |>
-      pull(AHECC_6)
+      pull(ahecc_6)
 
     err <- length(missing)
-    print(err)
 
 
   }
 
   df_hs <- df_hs |>
-    group_by(hs_product_code = h0) |>
-    summarise(across(c(ACT, NSW, NT, QLD, SA, TAS, VIC, WA), \(x) sum(x, na.rm = TRUE))) |>
-    ungroup()|>
-    mutate(year = as.integer(str_sub(year,0,4)) + 1)
+    group_by(year, hs_product_code = h0) |>
+    summarise(across(c(ACT, NSW, NT, Qld, SA, Tas, Vic, WA), \(x) sum(x, na.rm = TRUE)),
+              .groups = "drop")
 
 
   df_states <- bind_rows(list(df_states, df_hs))
 
+
 }
 
-df_states <- map(years, ~ahecc_to_hs(.x)) |>
+df_states <- map(1988:2023, ~ahecc_to_hs(df, .x)) |>
+  list_rbind()
+
+# df_states_check <- df_states |>
+#   pivot_longer(cols = -c(year, hs_product_code),
+#                names_to = 'state',
+#                values_to = 'fob_aud') |>
+#   group_by(year, state) |>
+#   summarise(value_hs = sum(fob_aud, na.rm = T), .groups = 'drop')
+# df_check <- df |>
+#   select(-ahecc_description, -ahecc_6) |>
+#   pivot_longer(cols = -c(year, ahecc_8),
+#                names_to = 'state',
+#                values_to = 'fob_aud') |>
+#   group_by(year, state) |>
+#   summarise(value_ahecc = sum(fob_aud, na.rm = T), .groups = 'drop')
+
+library(readabs)
+library(strayr)
+library(tidyverse)
+library(readxl)
+
+download_abs_data_cube("international-trade-supplementary-information-financial-year",
+                       path = "data-raw/state_export_data",
+                       cube = "536805500303.xlsx")
+
+fys <- as.numeric(str_sub(colnames(read_excel("data-raw/state_export_data/536805500303.xlsx", sheet = 2, skip = 5, n_max = 0)), 1L, 4L)) + 1
+fys <- fys[!is.na(fys)]
+
+service_cats <- tribble(
+  ~"ABS_cat", ~"hs_product_code",
+  "Manufacturing services on physical inputs owned by others", "other",
+  "Maintenance and repair services n.i.e", "other",
+  "Transport",  "transport",
+  "Travel",  "travel",
+  "Construction", "other",
+  "Insurance and Pension services", "financial",
+  "Financial Services", "financial",
+  "Charges for the use of intellectual property n.i.e", "other",
+  "Telecommunications, computer and information services", "ict",
+  "Other business services", "other",
+  "Personal, cultural, and recreational services", "other",
+  "Government goods and services n.i.e", "other")
+
+sheets <- paste0("Table 3.", 1:8)
+states <- str_to_upper(clean_state(x = 1:8, to = "state_abbr"))
+
+
+read_services_data <- function(sheet, state) {
+
+  read_excel("data-raw/state_export_data/536805500303.xlsx",
+             sheet = {{sheet}},
+             skip = 5,
+             n_max = 50,
+             col_names = c("ABS_cat", fys)) |>
+    pivot_longer(cols = -ABS_cat,
+                 names_to = "year",
+                 values_to = "export_value") |>
+    mutate(location_code = {{state}},
+           export_value = case_when(export_value == "-" ~ "0",
+                                    export_value == "np" ~ NA_character_,
+                                    TRUE ~ export_value),
+           export_value = 1e6*as.numeric(export_value),
+           year = as.integer(year)) |>
+    filter(ABS_cat %in% service_cats$ABS_cat,
+           year <= 2021) |>
+    left_join(service_cats, by = join_by(ABS_cat)) |>
+    group_by(location_code, year, hs_product_code) |>
+    summarise(export_value = sum(export_value, na.rm = TRUE),
+              .groups = "drop")
+
+}
+
+state_service_data <- map2(.x = sheets, .y = states, .f = ~read_services_data(.x, .y)) |>
   list_rbind()
 
 exchr <- read_csv("data-raw/misc/historical_exchange_rate_rba.csv", show_col_types = FALSE) |>
   mutate(date = dmy(date),
-         year = as.integer(str_sub(quarter(date, fiscal_start = 7, type = "year.quarter"), 0, 4))) |>
+         year = year(date)) |>
   summarise(aud_to_usd = mean(aud_to_usd), .by = year)
 
 
@@ -258,3 +328,5 @@ complexity_input_data <- complexity_input_data |>
 combined_exports <- complexity_input_data
 
 usethis::use_data(combined_exports, compress = "xz", overwrite = TRUE)
+usethis::use_data(state_service_data, compress = "xz", overwrite = TRUE)
+
