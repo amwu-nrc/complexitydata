@@ -184,7 +184,7 @@ ahecc_to_hs <- function(data, year) {
 
 }
 
-df_states <- map(1994:2023, ~ahecc_to_hs(df, .x)) |>
+df_states <- map(1995:2023, ~ahecc_to_hs(df, .x)) |>
   list_rbind()
 
 # df_states_check <- df_states |>
