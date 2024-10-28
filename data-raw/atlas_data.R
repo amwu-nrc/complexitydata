@@ -21,3 +21,10 @@ atlas_economic_complexity <- country_hsproduct4digit_year |>
 
 usethis::use_data(atlas_economic_complexity, compress = "xz", overwrite = TRUE)
 
+country_sitcproduct4digit_year <- read_dta("S:/CBGL-AITI/~General/~Data/Economic complexity/Atlas Data (2021)/country_sitcproduct4digit_year.dta")
+
+atlas_eci_sitc <- country_sitcproduct4digit_year |>
+  distinct(year, location_code, sitc_eci)
+
+usethis::use_data(atlas_eci_sitc, overwrite = TRUE, compress = "xz")
+

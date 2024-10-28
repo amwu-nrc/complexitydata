@@ -23,6 +23,12 @@
 #'
 "combined_exports"
 
+#' Austrailan State and territory merchandise exports
+#'
+#' @details
+#' Placeholder
+#'
+"state_exports_data"
 #' Australian State and territory services data
 #'
 #' Services data for Australian states and territories. From the ABS international trade supplementary information release
@@ -99,12 +105,18 @@
 "atlas_pci"
 
 #' Atlas of Economic Complexity Economic Complexity Index
+#' @name eci
+NULL
+
+#' @rdname eci
 "atlas_eci"
+
+#'@rdname eci
+"atlas_eci_sitc"
 
 #' ABS Employment Data
 #'
 #' @name absemployment
-#' @format Tibble with columns
 "sa3_indp1_occp1"
 
 #' ABS Employment by Industry by Occupation (SA2, 1-digit Industry, 1-digit Occupation)
@@ -114,6 +126,8 @@
 #' ABS Employment by Industry (SA3, 4-digit Industry)
 #' @rdname absemployment
 "sa3_indp4"
+
+
 
 #' ABS Employment by Occupation (SA3, 4-digit Occupation)
 #' @rdname absemployment
