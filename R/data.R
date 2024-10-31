@@ -123,6 +123,10 @@ NULL
 #' @rdname absemployment
 "sa2_indp1_occp1"
 
+#' ABS Employment by Industry (SA3, 3-digit Industry)
+#' @rdname absemployment
+"sa3_indp3"
+
 #' ABS Employment by Industry (SA3, 4-digit Industry)
 #' @rdname absemployment
 "sa3_indp4"

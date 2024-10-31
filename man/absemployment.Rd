@@ -5,14 +5,17 @@
 \alias{absemployment}
 \alias{sa3_indp1_occp1}
 \alias{sa2_indp1_occp1}
+\alias{sa3_indp3}
 \alias{sa3_indp4}
 \alias{sa3_occp4}
 \alias{sa3_indp2_occp1}
 \title{ABS Employment Data}
 \format{
-Tibble with columns
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 51680 rows and 3 columns.
 
 An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 373008 rows and 3 columns.
+
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 99280 rows and 3 columns.
 
 An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 244800 rows and 3 columns.
 
@@ -25,6 +28,8 @@ sa3_indp1_occp1
 
 sa2_indp1_occp1
 
+sa3_indp3
+
 sa3_indp4
 
 sa3_occp4
@@ -35,6 +40,8 @@ sa3_indp2_occp1
 ABS Employment Data
 
 ABS Employment by Industry by Occupation (SA2, 1-digit Industry, 1-digit Occupation)
+
+ABS Employment by Industry (SA3, 3-digit Industry)
 
 ABS Employment by Industry (SA3, 4-digit Industry)
 
