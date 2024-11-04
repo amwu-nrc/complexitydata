@@ -4,7 +4,7 @@ library(tidyverse)
 
 
 
-employment_complexity <- function(data, region, activity, digits, remove_totals = TRUE) {
+employment_complexity <- function(data, region, activity, digits, year, remove_totals = TRUE) {
 
 
   region_name <- paste({{region}}, "(POW)")
@@ -28,7 +28,8 @@ employment_complexity <- function(data, region, activity, digits, remove_totals 
                   count = Count)  |>
     dplyr::filter(.data[[region]] != "Total",
                   !str_detect(.data[[region]], "POW|Migratory"),
-                  !.data[[activity]] %in% c("Inadequately described", "Not stated", "Not applicable", "Total"))
+                  !.data[[activity]] %in% c("Inadequately described", "Not stated", "Not applicable", "Total")) |>
+    dplyr::mutate(year = {{year}})
 
   return(df)
 }
@@ -36,7 +37,7 @@ employment_complexity <- function(data, region, activity, digits, remove_totals 
 
 # sa2 ---------------------------------------------------------------------
 
-sa2_indp1_occp1 <- read_csv("data-raw/abs/sa2-pow-occp-indp-1-digit.csv.csv",
+sa2_indp1_occp1 <- read_csv("data-raw/abs/sa2-pow-occp-indp-1-digit-2021.csv",
                             skip = 9,
                             n_max = 625922,
                             col_select = c(sa2 = "SA2 (POW)",
@@ -53,11 +54,12 @@ sa2_indp1_occp1 <- read_csv("data-raw/abs/sa2-pow-occp-indp-1-digit.csv.csv",
          industry_occupation = paste0(anzsic_division, " (", anzsco_major,")"),
          industry_occupation = fct_inorder(industry_occupation)) |>
   group_by(sa2, industry_occupation) |>
-  summarise(count = sum(count), .groups = "drop")
+  summarise(count = sum(count), .groups = "drop") |>
+  mutate(year = 2021)
 
 
 # sa3 ---------------------------------------------------------------------
-sa3_indp1_occp1 <- read_csv("data-raw/abs/sa3-pow-occp-indp-1-digit.csv",
+sa3_indp1_occp1 <- read_csv("data-raw/abs/sa3-pow-occp-indp-1-digit-2021.csv",
                             skip = 9,
                             n_max = 99360,
                             col_select = c(sa3 = "SA3 (POW)",
@@ -76,7 +78,7 @@ sa3_indp1_occp1 <- read_csv("data-raw/abs/sa3-pow-occp-indp-1-digit.csv",
   group_by(sa3, industry_occupation) |>
   summarise(count = sum(count), .groups = "drop")
 
-sa3_indp2_occp1 <- read_csv("data-raw/abs/sa3-pow-indp-2-occp-1-digit.csv",
+sa3_indp2_occp1 <- read_csv("data-raw/abs/sa3-pow-indp-2-occp-1-digit-2021.csv",
                             skip = 9,
                             n_max = 431640,
                             col_select = c(sa3 = "SA3 (POW)",
@@ -93,9 +95,18 @@ sa3_indp2_occp1 <- read_csv("data-raw/abs/sa3-pow-indp-2-occp-1-digit.csv",
   group_by(sa3, industry_occupation) |>
   summarise(count = sum(count), .groups = "drop")
 
-sa3_occp4 <- employment_complexity("data-raw/abs/sa3-pow-occp-4-digit.csv", region = "SA3", activity = "occp", digits = 4)
-sa3_indp4 <- employment_complexity("data-raw/abs/sa3-pow-indp-4-digit-codes.csv", region = "SA3", activity = "indp", digits = 4)
-sa3_indp3 <- employment_complexity("data-raw/abs/sa3-pow-indp-3-digit.csv", region = "SA3", activity = "indp", digits = 3)
+sa3_occp4 <- employment_complexity("data-raw/abs/sa3-pow-occp-4-digit.csv", region = "SA3", activity = "occp", year = 2021, digits = 4)
+sa3_indp4 <- employment_complexity("data-raw/abs/sa3-pow-indp-4-digit-codes.csv", region = "SA3", activity = "indp", year = 2021, digits = 4)
+sa3_indp3 <- map2(
+  .x = c("data-raw/abs/sa3-pow-indp-3-digit-2011.csv",
+         "data-raw/abs/sa3-pow-indp-3-digit-2016.csv",
+         "data-raw/abs/sa3-pow-indp-3-digit-2021.csv"),
+  .y = c("2011",
+         "2016",
+         "2021"),
+  .f = ~employment_complexity(.x, year = .y, region = "SA3", activity = "indp", digits = 3)
+) |>
+  bind_rows()
 
 
 usethis::use_data(sa2_indp1_occp1,
