@@ -108,12 +108,15 @@ sa3_indp3 <- map2(
 ) |>
   bind_rows()
 
+sa4_indp4 <- employment_complexity("data-raw/abs/sa4-pow-indp-4-digit-codes-2021.csv")
+
 
 usethis::use_data(sa2_indp1_occp1,
                   sa3_indp1_occp1,
                   sa3_indp2_occp1,
                   sa3_indp3,
                   sa3_indp4,
+                  sa4_indp4,
                   sa3_occp4,
                   overwrite = TRUE, compress = "xz")
 devtools::document()
