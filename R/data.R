@@ -29,6 +29,7 @@
 #' Placeholder
 #'
 "state_exports_data"
+
 #' Australian State and territory services data
 #'
 #' Services data for Australian states and territories. From the ABS international trade supplementary information release
@@ -86,7 +87,6 @@
 #' Complexity indicators are calculated using the full data set [`combined_exports`]
 #' As such these indicators compare Australian states and the NT with the 133 countries
 #' Included in the Atlas of Economic Complexity. The included countries can be seen in [`atlas_countries`]
-
 "state_economic_complexity"
 
 #' Atlas of Economic Complexity Countries.
@@ -131,11 +131,12 @@ NULL
 #' @rdname absemployment
 "sa3_indp4"
 
-
-
 #' ABS Employment by Occupation (SA3, 4-digit Occupation)
 #' @rdname absemployment
 "sa3_occp4"
 
 #' @rdname absemployment
 "sa3_indp2_occp1"
+
+#' ABS AHECC Historic Conversion
+"anzsic_hs"
