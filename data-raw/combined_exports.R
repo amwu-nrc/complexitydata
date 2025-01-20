@@ -1,13 +1,12 @@
 ## code to prepare `combined_exports` dataset goes here
 library(readxl)
-library(readr)
-library(stringr)
 library(strayr)
-library(dplyr)
-library(tidyr)
 library(cli)
 library(purrr)
 library(lubridate)
+library(readabs)
+library(tidyverse)
+
 
 hs_92_92 <- read_csv("data-raw/concordance/hs92_to_hs92.csv",
                      col_types = list(h3 = "c", h0 = "c")) |>
@@ -203,10 +202,6 @@ df_states <- map(1995:2022, ~ahecc_to_hs(df, .x)) |>
 #   group_by(year, state) |>
 #   summarise(value_ahecc = sum(fob_aud, na.rm = T), .groups = 'drop')
 
-library(readabs)
-library(strayr)
-library(tidyverse)
-library(readxl)
 
 download_abs_data_cube("international-trade-supplementary-information-calendar-year",
                        path = "data-raw/state_export_data",
@@ -278,10 +273,16 @@ clean_states <- df_states |>
   mutate(export_value = export_value * aud_to_usd) |>
   select(-aud_to_usd)
 
+state_service_data <- state_service_data |>
+  left_join(exchr, by = "year") |>
+  mutate(export_value = export_value * aud_to_usd) |>
+  select(-aud_to_usd)
+
 atlas_country_classification <- read_tsv("data-raw/misc/location_country.tab")
 
 atlas_rankings <- read_tsv("data-raw/misc/rankings.tab",
                            show_col_types = FALSE) |>
+  filter(hs_eci != 0) |>
   inner_join(atlas_country_classification) |>
   mutate(year_location_code = paste0(year, iso3_code))
 

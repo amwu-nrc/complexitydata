@@ -1,6 +1,7 @@
 ## code to prepare `atlas_pci` dataset goes here
 library(haven)
 library(dplyr)
+library(readr)
 
 country_hsproduct4digit_year <- read_dta("S:/CBGL-AITI/~General/~Data/Economic complexity/Atlas Data (2022)/hs92_country_product_year_4.dta")
 atlas_classification <- read_tsv("data-raw/misc/rankings.tab")
