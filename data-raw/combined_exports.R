@@ -45,17 +45,17 @@ df_states <- tibble(
   "ACT" = numeric(),
   "NSW" = numeric(),
   "NT" = numeric(),
-  "QLD" = numeric(),
+  "Qld" = numeric(),
   "SA" = numeric(),
-  "TAS" = numeric(),
-  "VIC" = numeric(),
+  "Tas" = numeric(),
+  "Vic" = numeric(),
   "WA" = numeric()
 )
 
 df <- read_excel("data-raw/state_export_data/abs_calendar_year_request.xlsx",
                  sheet = "Table 1",
                  skip = 7,
-                 n_max = 802034,
+                 n_max = 802033,
                  col_names = c("year", "ahecc_8", "ahecc_description", "state", "fob_aud")) |>
   mutate(year = as.integer(str_extract(year, "[0-9]*")),
          state = case_when(
@@ -67,6 +67,8 @@ df <- read_excel("data-raw/state_export_data/abs_calendar_year_request.xlsx",
          ahecc_6 = str_sub(ahecc_8, 0L, 6L)) |>
   filter(ahecc_8 != "98888888") |>  #Can't find any information about this code.
   pivot_wider(names_from = state, values_from = fob_aud, values_fill = 0)
+
+state_exports_data <- df
 
 ahecc_to_hs <- function(data, year) {
   #Read the state data for a year
@@ -184,7 +186,7 @@ ahecc_to_hs <- function(data, year) {
 
 }
 
-df_states <- map(1995:2021, ~ahecc_to_hs(df, .x)) |>
+df_states <- map(1995:2022, ~ahecc_to_hs(df, .x)) |>
   list_rbind()
 
 # df_states_check <- df_states |>
@@ -206,12 +208,12 @@ library(strayr)
 library(tidyverse)
 library(readxl)
 
-download_abs_data_cube("international-trade-supplementary-information-financial-year",
+download_abs_data_cube("international-trade-supplementary-information-calendar-year",
                        path = "data-raw/state_export_data",
-                       cube = "536805500303.xlsx")
+                       cube = "536805500403.xlsx")
 
-fys <- as.numeric(str_sub(colnames(read_excel("data-raw/state_export_data/536805500303.xlsx", sheet = 2, skip = 5, n_max = 0)), 1L, 4L)) + 1
-fys <- fys[!is.na(fys)]
+ys <- as.numeric(str_sub(colnames(read_excel("data-raw/state_export_data/536805500403.xlsx", sheet = 2, skip = 5, n_max = 0))))
+ys <- ys[!is.na(ys)]
 
 service_cats <- tribble(
   ~"ABS_cat", ~"hs_product_code",
@@ -234,11 +236,11 @@ states <- str_to_upper(clean_state(x = 1:8, to = "state_abbr"))
 
 read_services_data <- function(sheet, state) {
 
-  read_excel("data-raw/state_export_data/536805500303.xlsx",
+  read_excel("data-raw/state_export_data/536805500403.xlsx",
              sheet = {{sheet}},
              skip = 5,
              n_max = 50,
-             col_names = c("ABS_cat", fys)) |>
+             col_names = c("ABS_cat", ys)) |>
     pivot_longer(cols = -ABS_cat,
                  names_to = "year",
                  values_to = "export_value") |>
@@ -249,7 +251,7 @@ read_services_data <- function(sheet, state) {
            export_value = 1e6*as.numeric(export_value),
            year = as.integer(year)) |>
     filter(ABS_cat %in% service_cats$ABS_cat,
-           year <= 2021) |>
+           year <= 2022) |>
     left_join(service_cats, by = join_by(ABS_cat)) |>
     group_by(location_code, year, hs_product_code) |>
     summarise(export_value = sum(export_value, na.rm = TRUE),
@@ -271,21 +273,25 @@ clean_states <- df_states |>
   group_by(year, location_code, hs_product_code = str_sub(hs_product_code, 0L, 4L)) |>
   summarise(export_value = sum(export_value),
             .groups = "drop") |>
-  bind_rows(state_service_data) |>
+  #bind_rows(state_service_data) |>
   left_join(exchr, by = "year") |>
   mutate(export_value = export_value * aud_to_usd) |>
   select(-aud_to_usd)
 
+atlas_country_classification <- read_tsv("data-raw/misc/location_country.tab")
+
 atlas_rankings <- read_tsv("data-raw/misc/rankings.tab",
                            show_col_types = FALSE) |>
-  mutate(year_location_code = paste0(year, code))
+  inner_join(atlas_country_classification) |>
+  mutate(year_location_code = paste0(year, iso3_code))
 
 product_rankings <- readxl::read_excel("data-raw/misc/classifications.xlsx",
                                        sheet = "hs_product_id")
 
+atlas_economic_complexity <- get(load("data/atlas_economic_complexity.rda"))
 
 
-atlas <- get(load("data-raw/atlas_export_data/country_hsproduct4digit_year.rda")) |>
+atlas <- atlas_economic_complexity |>
   select(year, export_value, location_code, hs_product_code) |>
   mutate(year_location_code = paste0(year, location_code)) |>
   filter(location_code != "AUS",
@@ -329,4 +335,5 @@ combined_exports <- complexity_input_data
 
 usethis::use_data(combined_exports, compress = "xz", overwrite = TRUE)
 usethis::use_data(state_service_data, compress = "xz", overwrite = TRUE)
+usethis::use_data(state_exports_data, compress = "xz", overwrite = TRUE)
 

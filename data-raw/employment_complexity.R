@@ -108,7 +108,7 @@ sa3_indp3 <- map2(
 ) |>
   bind_rows()
 
-sa4_indp4 <- employment_complexity("data-raw/abs/sa4-pow-indp-4-digit-codes-2021.csv")
+sa4_indp4 <- employment_complexity("data-raw/abs/sa4-pow-indp-4-digit-codes-2021.csv", region = "SA4", activity = "indp", year = 2021, digits = 4)
 
 
 usethis::use_data(sa2_indp1_occp1,
