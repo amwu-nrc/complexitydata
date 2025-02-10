@@ -8,8 +8,9 @@ atlas_classification <- read_tsv("data-raw/misc/rankings.tab")
 atlas_product_classification <- read_tsv("data-raw/misc/product_hs92.tab")
 
 atlas_pci <- country_hsproduct4digit_year |>
-  distinct(year, product_id, pci) |>
-  inner_join(atlas_product_classification)
+  distinct(year, product_id, product_complexity_index = pci) |>
+  inner_join(atlas_product_classification) |>
+  rename(hs_product_code = code)
 
 usethis::use_data(atlas_pci, overwrite = TRUE, compress = "xz")
 
