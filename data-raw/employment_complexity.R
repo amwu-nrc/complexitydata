@@ -110,6 +110,10 @@ sa3_indp3 <- map2(
 
 sa4_indp4 <- employment_complexity("data-raw/abs/sa4-pow-indp-4-digit-codes-2021.csv", region = "SA4", activity = "indp", year = 2021, digits = 4)
 
+# lga
+
+lga_indp3 <- employment_complexity("data-raw/abs/lga-pow-indp3-digit-2022.csv", region = "LGA", activity = "indp", year = 2022, digits = 3)
+
 
 usethis::use_data(sa2_indp1_occp1,
                   sa3_indp1_occp1,
@@ -118,5 +122,6 @@ usethis::use_data(sa2_indp1_occp1,
                   sa3_indp4,
                   sa4_indp4,
                   sa3_occp4,
+                  lga_indp3,
                   overwrite = TRUE, compress = "xz")
 devtools::document()
