@@ -11,7 +11,7 @@ load_all()
 data("combined_exports")
 
 state_data <- combined_exports |>
-  filter(!location_code %in% c("ACT", "IRQ"))
+  filter(!location_code %in% c("ACT"))
 
 economic_complexity <- calculate_complexity_time_series(data = state_data,
                                                               region = "location_code",

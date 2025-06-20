@@ -7,9 +7,9 @@
 \alias{atlas_eci_sitc}
 \title{Atlas of Economic Complexity Economic Complexity Index}
 \format{
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 6587 rows and 3 columns.
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 4179 rows and 4 columns.
 
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 12938 rows and 3 columns.
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 4179 rows and 4 columns.
 }
 \usage{
 atlas_eci

@@ -185,7 +185,7 @@ ahecc_to_hs <- function(data, year) {
 
 }
 
-df_states <- map(1995:2022, ~ahecc_to_hs(df, .x)) |>
+df_states <- map(1995:2023, ~ahecc_to_hs(df, .x)) |>
   list_rbind()
 
 # df_states_check <- df_states |>
@@ -278,58 +278,56 @@ state_service_data <- state_service_data |>
   mutate(export_value = export_value * aud_to_usd) |>
   select(-aud_to_usd)
 
-atlas_country_classification <- read_tsv("data-raw/misc/location_country.tab")
-
-atlas_rankings <- read_tsv("data-raw/misc/rankings.tab",
-                           show_col_types = FALSE) |>
-  filter(hs_eci != 0) |>
-  inner_join(atlas_country_classification) |>
-  mutate(year_location_code = paste0(year, iso3_code))
-
-product_rankings <- readxl::read_excel("data-raw/misc/classifications.xlsx",
-                                       sheet = "hs_product_id")
+# atlas_country_classification <- read_tsv("data-raw/misc/location_country.tab")
+#
+# atlas_rankings <- read_tsv("data-raw/misc/rankings.tab",
+#                            show_col_types = FALSE) |>
+#   filter(hs_eci != 0) |>
+#   inner_join(atlas_country_classification) |>
+#   mutate(year_location_code = paste0(year, iso3_code))
+#
+# product_rankings <- readxl::read_excel("data-raw/misc/classifications.xlsx",
+#                                        sheet = "hs_product_id")
 
 atlas_economic_complexity <- get(load("data/atlas_economic_complexity.rda"))
 
 
-atlas <- atlas_economic_complexity |>
-  select(year, export_value, location_code, hs_product_code) |>
-  mutate(year_location_code = paste0(year, location_code)) |>
-  filter(location_code != "AUS",
-         !is.na(export_value),
-         year_location_code %in% atlas_rankings$year_location_code,
-         hs_product_code %in% product_rankings$hs_product_code) |>
-  select(-year_location_code)
+# atlas <- atlas_economic_complexity |>
+#   select(year, export_value, location_code, hs_product_code) |>
+#   mutate(year_location_code = paste0(year, location_code)) |>
+#   filter(location_code != "AUS",
+#          !is.na(export_value),
+#          year_location_code %in% atlas_rankings$year_location_code,
+#          hs_product_code %in% product_rankings$hs_product_code) |>
+#   select(-year_location_code)
 
 
 
-complexity_input_data <- bind_rows(atlas, clean_states) |>
-  complete(year, location_code, hs_product_code) |>
-  replace_na(list(export_value = 0)) |>
+complexity_input_data <- bind_rows(atlas_economic_complexity, clean_states) |>
   arrange(year, hs_product_code, location_code)
 
-#Identify year-country pairs with 0 exports
-country_filter <- complexity_input_data |>
-  group_by(year, location_code) |>
-  summarise(country_test = sum(export_value, na.rm = T), .groups = "drop")  |>
-  filter(country_test == 0) |>
-  mutate(country_test = str_c(year, location_code, sep = "-")) |>
-  pull(country_test)
+# #Identify year-country pairs with 0 exports
+# country_filter <- complexity_input_data |>
+#   group_by(year, location_code) |>
+#   summarise(country_test = sum(export_value, na.rm = T), .groups = "drop")  |>
+#   filter(country_test == 0) |>
+#   mutate(country_test = str_c(year, location_code, sep = "-")) |>
+#   pull(country_test)
+#
+# #Identify year-product pairs with 0 exports
+# product_filter <- complexity_input_data |>
+#   group_by(year, hs_product_code) |>
+#   summarise(product_test = sum(export_value, na.rm = T), .groups = "drop") |>
+#   filter(product_test == 0) |>
+#   mutate(product_test = str_c(year, hs_product_code, sep = "-")) |>
+#   pull(product_test)
 
-#Identify year-product pairs with 0 exports
-product_filter <- complexity_input_data |>
-  group_by(year, hs_product_code) |>
-  summarise(product_test = sum(export_value, na.rm = T), .groups = "drop") |>
-  filter(product_test == 0) |>
-  mutate(product_test = str_c(year, hs_product_code, sep = "-")) |>
-  pull(product_test)
-
-complexity_input_data <- complexity_input_data |>
-  mutate(country_test = str_c(year, location_code, sep = "-"),
-         product_test = str_c(year, hs_product_code, sep = "-"))  |>
-  filter(!country_test %in% country_filter,
-         !product_test %in% product_filter) |>
-  select(-country_test, -product_test)
+# complexity_input_data <- complexity_input_data |>
+#   mutate(country_test = str_c(year, location_code, sep = "-"),
+#          product_test = str_c(year, hs_product_code, sep = "-"))  |>
+#   filter(!country_test %in% country_filter,
+#          !product_test %in% product_filter) |>
+#   select(-country_test, -product_test)
 
 
 combined_exports <- complexity_input_data

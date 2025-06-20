@@ -5,7 +5,7 @@
 \alias{atlas_pci}
 \title{Atlas of Economic Complexity Product Complexity Index}
 \format{
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 34816 rows and 3 columns.
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 35897 rows and 3 columns.
 }
 \usage{
 atlas_pci
