@@ -100,6 +100,9 @@
 #' }
 "atlas_countries"
 
+#' Atlas of Economic Complexity Data
+"atlas_economic_complexity"
+
 #' Atlas of Economic Complexity Product Complexity Index
 #'
 "atlas_pci"
@@ -137,6 +140,12 @@ NULL
 
 #' @rdname absemployment
 "sa3_indp2_occp1"
+
+#' @rdname absemployment
+"lga_indp3"
+
+#' @rdname absemployment
+"sa4_indp4"
 
 #' ABS AHECC Historic Conversion
 "anzsic_hs"
