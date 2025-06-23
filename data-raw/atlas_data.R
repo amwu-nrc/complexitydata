@@ -1,6 +1,6 @@
 ## code to prepare datasets using atlas of economic complexity data
 library(readr)
-
+library(dplyr)
 country_details <- read_csv("data-raw/misc/location_country.csv")
 product_details <- read_csv("data-raw/misc/product_hs92.csv")
 country_product <- read_csv("data-raw/atlas_export_data/hs92_country_product_year_4.csv")
