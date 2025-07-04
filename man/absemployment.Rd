@@ -9,6 +9,9 @@
 \alias{sa3_indp4}
 \alias{sa3_occp4}
 \alias{sa3_indp2_occp1}
+\alias{lga_indp3}
+\alias{sa4_indp4}
+\alias{sa4_indp1_occp2}
 \title{ABS Employment Data}
 \format{
 An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 51680 rows and 3 columns.
@@ -22,6 +25,12 @@ An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) w
 An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 161160 rows and 4 columns.
 
 An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 285600 rows and 3 columns.
+
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 162352 rows and 4 columns.
+
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 64080 rows and 4 columns.
+
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 86241 rows and 3 columns.
 }
 \usage{
 sa3_indp1_occp1
@@ -35,6 +44,12 @@ sa3_indp4
 sa3_occp4
 
 sa3_indp2_occp1
+
+lga_indp3
+
+sa4_indp4
+
+sa4_indp1_occp2
 }
 \description{
 ABS Employment Data

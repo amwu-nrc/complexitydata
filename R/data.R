@@ -147,5 +147,8 @@ NULL
 #' @rdname absemployment
 "sa4_indp4"
 
+#' @rdname absemployment
+"sa4_indp1_occp2"
+
 #' ABS AHECC Historic Conversion
 "anzsic_hs"

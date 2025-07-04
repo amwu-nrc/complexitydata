@@ -110,6 +110,22 @@ sa3_indp3 <- map2(
 
 sa4_indp4 <- employment_complexity("data-raw/abs/sa4-pow-indp-4-digit-codes-2021.csv", region = "SA4", activity = "indp", year = 2021, digits = 4)
 
+sa4_indp1_occp2 <- read_csv("data-raw/abs/sa4-pow-indp1-occp2-digit-2021.csv",
+                            skip = 9,
+                            n_max = 135378,
+                            col_select = c(sa4 = "SA4 (POW)",
+                                           anzsic_division = "1-digit level INDP Industry of Employment",
+                                           anzsco_submajor = "2-digit level OCCP Occupation",
+                                           count = Count)) |>
+  filter(!anzsic_division %in% c("Inadequately described", "Not stated", "Not applicable", "Total"),
+         !anzsco_submajor %in% c("Inadequately described", "Not stated", "Not applicable", "Total"),
+         !str_detect(sa4, "Total|POW|Migrator")) |>
+  mutate(anzsic_division = fct_inorder(anzsic_division),
+         anzsco_submajor = fct_inorder(anzsco_submajor),
+         industry_occupation = paste0(anzsic_division, " (", anzsco_submajor, ")"),
+         industry_occupation = fct_inorder(industry_occupation)) |>
+  group_by(sa4, industry_occupation) |>
+  summarise(count = sum(count), .groups = "drop")
 # lga
 
 lga_indp3 <- employment_complexity("data-raw/abs/lga-pow-indp3-digit-2022.csv", region = "LGA", activity = "indp", year = 2022, digits = 3)
