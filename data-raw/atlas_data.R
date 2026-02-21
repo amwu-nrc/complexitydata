@@ -1,10 +1,12 @@
 ## code to prepare datasets using atlas of economic complexity data
 library(readr)
 library(dplyr)
-country_details <- read_csv("data-raw/misc/location_country.csv")
-product_details <- read_csv("data-raw/misc/product_hs92.csv")
+
+
+country_details <- read_csv("data-raw/atlas_export_data/location_country.csv")
+product_details <- read_csv("data-raw/atlas_export_data/product_hs92.csv")
 country_product <- read_csv("data-raw/atlas_export_data/hs92_country_product_year_4.csv")
-rankings <- read_csv("data-raw/misc/growth_proj_eci_rankings.csv")
+rankings <- read_csv("data-raw/atlas_export_data/growth_proj_eci_rankings.csv")
 
 atlas_economic_complexity <- country_product|>
   inner_join(country_details) |>
@@ -15,7 +17,7 @@ atlas_economic_complexity <- country_product|>
          location_code = country_iso3_code,
          location_name = country_name_short,
          hs_product_code = product_hs92_code,
-         hs_name_short_en = product_name)
+         hs_name_short_en = product_name_short)
 
 usethis::use_data(atlas_economic_complexity, compress = "xz", overwrite = TRUE)
 
