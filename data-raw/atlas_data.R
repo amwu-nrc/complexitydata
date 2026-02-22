@@ -6,6 +6,7 @@ library(dplyr)
 country_details <- read_csv("data-raw/atlas_export_data/location_country.csv")
 product_details <- read_csv("data-raw/atlas_export_data/product_hs92.csv")
 country_product <- read_csv("data-raw/atlas_export_data/hs92_country_product_year_4.csv")
+country_year <- read_csv("data-raw/atlas_export_data/hs92_country_year.csv")
 rankings <- read_csv("data-raw/atlas_export_data/growth_proj_eci_rankings.csv")
 
 atlas_economic_complexity <- country_product|>
@@ -27,14 +28,19 @@ atlas_eci_sitc <- rankings |>
 
 usethis::use_data(atlas_eci_sitc, overwrite = TRUE, compress = "xz")
 
+# Product Level Complexity Data
 
-atlas_pci <- country_product |>
-  distinct(year, hs_product_code = product_hs92_code, product_complexity_index = pci)
+atlas_complexity_product <- country_product |>
+  distinct(year,
+           hs_product_code = product_hs92_code,
+           product_complexity_index = pci)
 
-usethis::use_data(atlas_pci, overwrite = TRUE, compress = "xz")
+usethis::use_data(atlas_complexity_product, overwrite = TRUE, compress = "xz")
 
-atlas_eci <- rankings |>
-  distinct(year, location_code = country_iso3_code, eci_hs92, eci_rank_hs92)
+atlas_complexity_country <- rankings |>
+  inner_join(country_year) |>
+  distinct(year, location_code = country_iso3_code, eci, export_value, eci_rank_hs92, growth_proj, coi, diversity)
 
-usethis::use_data(atlas_eci, overwrite = TRUE, compress = "xz")
+usethis::use_data(atlas_complexity_country, overwrite = TRUE, compress = "xz")
+
 
