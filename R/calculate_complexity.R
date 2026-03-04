@@ -32,8 +32,26 @@ calculate_complexity <- function(data, region, product, value, year) {
                           values_to = values_to)
   }
 
-  bi <- economiccomplexity::balassa_index(data, discrete = TRUE, country = {{region}}, product = {{product}},
-                                          value = {{value}})
+  rca <- data |>
+    dplyr::select({{product}}, {{region}}, {{value}}) |>
+    dplyr::mutate(export_value_c = sum(.data[[value]]), .by = {{region}}) |>
+    dplyr::mutate(export_value_p = sum(.data[[value]]), .by = {{product}}) |>
+    dplyr::mutate(export_value_cp = sum(.data[[value]]),
+                  rca_cp = (export_value/export_value_c)/(export_value_p/export_value_cp),
+                  bi = rca_cp/(1+rca_cp))
+
+  countries <- as.factor(data[[region]])
+  products <- as.factor(data[[product]])
+
+  matrix_data <- matrix(0,
+                        nrow = length(levels(countries)),
+                        ncol = length(levels(products)),
+                        dimnames = list(levels(countries), levels(products)))
+  indices <- cbind(as.numeric(countries), as.numeric(products))
+
+  matrix_data[indices] <- rca$bi
+
+  bi <- matrix_data
 
   complexity <- economiccomplexity::complexity_measures(bi, method = "eigenvalues")
 
@@ -43,8 +61,8 @@ calculate_complexity <- function(data, region, product, value, year) {
 
   dens <- economiccomplexity::density(bi, prox$proximity_product)
 
-  rca <- economiccomplexity::balassa_index(data, discrete = FALSE, country = {{region}}, product = {{product}}, value = {{value}}) |>
-    matrix_to_df(region = region, product = product, values_to = "rca")
+  rca <- rca |>
+    dplyr::select({{product}}, {{region}}, rca_cp)
 
   pci <- tibble::enframe(complexity$complexity_index_product, name = product, value = "product_complexity_index")
   eci <- tibble::enframe(complexity$complexity_index_country, name = region, value = "country_complexity_index")
