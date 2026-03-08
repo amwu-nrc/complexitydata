@@ -1,26 +1,34 @@
 ## code to prepare datasets using atlas of economic complexity data
 library(readr)
 library(dplyr)
+library(purrr)
 
 
 country_details <- read_csv("data-raw/atlas_export_data/location_country.csv")
-product_details <- read_csv("data-raw/atlas_export_data/product_hs92.csv")
-country_product <- read_csv("data-raw/atlas_export_data/hs92_country_product_year_4.csv")
+
+product_details <- list(hs92 = read_csv("data-raw/atlas_export_data/product_hs92.csv"),
+                        hs12 = read_csv("data-raw/atlas_export_data/product_hs12.csv"))
+country_product <- list(hs92 = read_csv("data-raw/atlas_export_data/hs92_country_product_year_4.csv"),
+                        hs12 = read_csv("data-raw/atlas_export_data/hs12_country_product_year_4.csv"))
+
 country_year <- read_csv("data-raw/atlas_export_data/hs92_country_year.csv")
+
 rankings <- read_csv("data-raw/atlas_export_data/growth_proj_eci_rankings.csv")
 
-atlas_economic_complexity <- country_product|>
+atlas_economic_complexity92 <-  country_product$hs92 |>
   inner_join(country_details) |>
-  inner_join(product_details) |>
+  inner_join(product_details$hs92) |>
   filter(in_rankings) |>
   select(year,
          export_value,
          location_code = country_iso3_code,
          location_name = country_name_short,
-         hs_product_code = product_hs92_code,
+         hs_product_code = hs,
          hs_name_short_en = product_name_short)
 
-usethis::use_data(atlas_economic_complexity, compress = "xz", overwrite = TRUE)
+#usethis::use_data(atlas_economic_complexity, compress = "xz", overwrite = TRUE)
+
+}
 
 
 atlas_eci_sitc <- rankings |>
