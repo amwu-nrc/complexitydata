@@ -127,6 +127,9 @@ sa4_indp1_occp2 <- read_csv("data-raw/abs/sa4-pow-indp1-occp2-digit-2021.csv",
   group_by(sa4, industry_occupation) |>
   summarise(count = sum(count), .groups = "drop")
 
+sa4_occp6 <- employment_complexity("data-raw/abs/sa4-pow-occp-4-digit-2021.csv", region = "SA4", activity = "occp", year = 2021, digits = 4)
+
+
 sa4_occp6 <- employment_complexity("data-raw/abs/sa4-pow-occp-6-digit-2021.csv", region = "SA4", activity = "occp", year = 2021, digits = 6)
 
 # lga
