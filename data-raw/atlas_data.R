@@ -9,7 +9,8 @@ country_details <- read_csv("data-raw/atlas_export_data/location_country.csv")
 product_details <- list(hs92 = read_csv("data-raw/atlas_export_data/product_hs92.csv"),
                         hs12 = read_csv("data-raw/atlas_export_data/product_hs12.csv"))
 country_product <- list(hs92 = read_csv("data-raw/atlas_export_data/hs92_country_product_year_4.csv"),
-                        hs12 = read_csv("data-raw/atlas_export_data/hs12_country_product_year_4.csv"))
+                        hs12 = read_csv("data-raw/atlas_export_data/hs12_country_product_year_4.csv"),
+                        sitc = read_csv("data-raw/atlas_export_data/sitc_country_product_year_4.csv"))
 
 country_year <- list(hs92 = read_csv("data-raw/atlas_export_data/hs92_country_year.csv"),
                      hs12 = read_csv("data-raw/atlas_export_data/hs12_country_year.csv"))
@@ -65,8 +66,20 @@ smooth_economic_complexity12 <- atlas_economic_complexity12 |>
   select(year, export_value, export_rca, location_code, location_name, hs_product_code, hs_name_short_en) |>
   filter(!is.na(export_value))
 
+atlas_economic_complexitysitc <- country_product$sitc |>
+  filter(country_id %in% rankings$country_id) |>
+  calculate_complexity_time_series(years = unique(country_product$sitc$year), region = "country_iso3_code", product = "product_sitc_code", value = "export_value")
+
+sitc_eci_long <- atlas_economic_complexitysitc |>
+  distinct(country_iso3_code, year, country_complexity_index) |>
+  mutate(eci_rank_sitc = rank(-country_complexity_index), .by = year)
+
+
 usethis::use_data(atlas_economic_complexity92, compress = "xz", overwrite = TRUE)
 usethis::use_data(smooth_economic_complexity92, compress = "xz", overwrite = TRUE)
+usethis::use_data(atlas_economic_complexitysitc, compress = "xz", overwrite = TRUE)
+usethis::use_data(sitc_eci_long, compress = "xz", overwrite = TRUE)
+
 
 usethis::use_data(atlas_economic_complexity12, compress = "xz", overwrite = TRUE)
 usethis::use_data(smooth_economic_complexity12, compress = "xz", overwrite = TRUE)
