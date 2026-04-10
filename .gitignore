@@ -4,3 +4,5 @@
 .httr-oauth
 .DS_Store
 .quarto
+data-raw/atlas_export_data/growth_proj_eci_rankings.csv
+data-raw/atlas_export_data/hs92_country_product_year_6.csv
