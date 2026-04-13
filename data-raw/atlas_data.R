@@ -78,7 +78,7 @@ sitc_eci_long <- atlas_economic_complexitysitc |>
 usethis::use_data(atlas_economic_complexity92, compress = "xz", overwrite = TRUE)
 usethis::use_data(smooth_economic_complexity92, compress = "xz", overwrite = TRUE)
 usethis::use_data(atlas_economic_complexitysitc, compress = "xz", overwrite = TRUE)
-usethis::use_data(sitc_eci_long, compress = "xz", overwrite = TRUE)
+usethis::use_data(atlas_economic_complexitysitc_long, compress = "xz", overwrite = TRUE)
 
 
 usethis::use_data(atlas_economic_complexity12, compress = "xz", overwrite = TRUE)
