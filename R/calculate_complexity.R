@@ -18,57 +18,95 @@
 #' year = 1996)
 #'
 #' }
-calculate_complexity <- function(data, region, product, value, year) {
-
+calculate_complexity <- function(
+  data,
+  region,
+  product,
+  value,
+  year,
+  continuous = F
+) {
   data <- data |>
-    dplyr::filter(year == {{year}})
+    dplyr::filter(year == {{ year }})
 
   matrix_to_df <- function(matrix, region, product, values_to) {
-
     as.matrix(matrix) |>
       dplyr::as_tibble(rownames = region) |>
-      tidyr::pivot_longer(cols = -region,
-                          names_to = dplyr::all_of(product),
-                          values_to = values_to)
+      tidyr::pivot_longer(
+        cols = -region,
+        names_to = dplyr::all_of(product),
+        values_to = values_to
+      )
   }
 
   rca <- data |>
-    dplyr::select({{product}}, {{region}}, {{value}}) |>
-    dplyr::mutate(export_value_c = sum(.data[[value]]), .by = {{region}}) |>
-    dplyr::mutate(export_value_p = sum(.data[[value]]), .by = {{product}}) |>
-    dplyr::mutate(export_value_cp = sum(.data[[value]]),
-                  rca_cp = (export_value/export_value_c)/(export_value_p/export_value_cp),
-                  bi = rca_cp/(1+rca_cp))
+    dplyr::select({{ product }}, {{ region }}, {{ value }}) |>
+    dplyr::mutate(export_value_c = sum(.data[[value]]), .by = {{ region }}) |>
+    dplyr::mutate(export_value_p = sum(.data[[value]]), .by = {{ product }}) |>
+    dplyr::mutate(
+      export_value_cp = sum(.data[[value]]),
+      rca_cp = (export_value / export_value_c) /
+        (export_value_p / export_value_cp),
+      bi = as.numeric(rca_cp >= 1),
+      bi_c = rca_cp / (1 + rca_cp)
+    )
 
   countries <- as.factor(data[[region]])
   products <- as.factor(data[[product]])
 
-  matrix_data <- matrix(0,
-                        nrow = length(levels(countries)),
-                        ncol = length(levels(products)),
-                        dimnames = list(levels(countries), levels(products)))
+  matrix_data <- matrix(
+    0,
+    nrow = length(levels(countries)),
+    ncol = length(levels(products)),
+    dimnames = list(levels(countries), levels(products))
+  )
   indices <- cbind(as.numeric(countries), as.numeric(products))
 
-  matrix_data[indices] <- rca$bi
+  if (continuous) {
+    matrix_data[indices] <- rca$bi_c
+  } else {
+    matrix_data[indices] <- rca$bi
+  }
 
   bi <- matrix_data
 
-  complexity <- economiccomplexity::complexity_measures(bi, method = "eigenvalues")
+  complexity <- economiccomplexity::complexity_measures(
+    bi,
+    method = "eigenvalues"
+  )
 
   prox <- economiccomplexity::proximity(bi)
 
-  outlook <- economiccomplexity::complexity_outlook(bi, prox$proximity_product, complexity$complexity_index_product)
+  outlook <- economiccomplexity::complexity_outlook(
+    bi,
+    prox$proximity_product,
+    complexity$complexity_index_product
+  )
 
   dens <- economiccomplexity::density(bi, prox$proximity_product)
 
   rca <- rca |>
-    dplyr::select({{product}}, {{region}}, rca_cp)
+    dplyr::select({{ product }}, {{ region }}, rca_cp)
 
-  pci <- tibble::enframe(complexity$complexity_index_product, name = product, value = "product_complexity_index")
-  eci <- tibble::enframe(complexity$complexity_index_country, name = region, value = "country_complexity_index")
-  coi <- tibble::enframe(outlook$complexity_outlook_index, name = region, value = "complexity_outlook_index")
-  cog <- outlook$complexity_outlook_gain |> matrix_to_df(region = region, product = product, values_to = "cog")
-  d <- dens |> matrix_to_df(region = region, product = product, values_to = "density")
+  pci <- tibble::enframe(
+    complexity$complexity_index_product,
+    name = product,
+    value = "product_complexity_index"
+  )
+  eci <- tibble::enframe(
+    complexity$complexity_index_country,
+    name = region,
+    value = "country_complexity_index"
+  )
+  coi <- tibble::enframe(
+    outlook$complexity_outlook_index,
+    name = region,
+    value = "complexity_outlook_index"
+  )
+  cog <- outlook$complexity_outlook_gain |>
+    matrix_to_df(region = region, product = product, values_to = "cog")
+  d <- dens |>
+    matrix_to_df(region = region, product = product, values_to = "density")
 
   out <- dplyr::left_join(data, rca, by = c(region, product)) |>
     dplyr::left_join(pci, by = product) |>
@@ -78,7 +116,6 @@ calculate_complexity <- function(data, region, product, value, year) {
     dplyr::left_join(d, by = c(region, product))
 
   out
-
 }
 
 #' Calculate economic complexity indicators for multiple years
@@ -101,9 +138,23 @@ calculate_complexity <- function(data, region, product, value, year) {
 #' value = "export_value")
 #'
 #' }
-calculate_complexity_time_series <- function(data, years, region, product, value) {
-  purrr::map(.x = years,
-             .f = ~calculate_complexity(data, region = {{region}}, product = {{product}}, value = {{value}}, year = .x),
-             .progress = TRUE) |>
+calculate_complexity_time_series <- function(
+  data,
+  years,
+  region,
+  product,
+  value
+) {
+  purrr::map(
+    .x = years,
+    .f = ~ calculate_complexity(
+      data,
+      region = {{ region }},
+      product = {{ product }},
+      value = {{ value }},
+      year = .x
+    ),
+    .progress = TRUE
+  ) |>
     purrr::list_rbind()
 }
