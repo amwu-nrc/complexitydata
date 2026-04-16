@@ -1,139 +1,83 @@
 ## code to prepare datasets using atlas of economic complexity data
 library(readr)
 library(dplyr)
+library(arrow)
 library(purrr)
-library(zoo)
+library(stringr)
+library(ecomplexity)
+atlas_trade_data <- function(data, classification) {
 
-country_details <- read_csv("data-raw/atlas_export_data/location_country.csv")
+  classification <- str_split_1(classification, "_")
+  trade_codec <- classification[1]
+  digits <- classification[2]
 
-product_details <- list(hs92 = read_csv("data-raw/atlas_export_data/product_hs92.csv"),
-                        hs12 = read_csv("data-raw/atlas_export_data/product_hs12.csv"))
-country_product <- list(hs92 = read_csv("data-raw/atlas_export_data/hs92_country_product_year_4.csv"),
-                        hs12 = read_csv("data-raw/atlas_export_data/hs12_country_product_year_4.csv"),
-                        sitc = read_csv("data-raw/atlas_export_data/sitc_country_product_year_4.csv"))
-
-country_year <- list(hs92 = read_csv("data-raw/atlas_export_data/hs92_country_year.csv"),
-                     hs12 = read_csv("data-raw/atlas_export_data/hs12_country_year.csv"))
-
-rankings <- read_csv("data-raw/atlas_export_data/growth_proj_eci_rankings.csv")
-
-atlas_economic_complexity92 <-  country_product$hs92 |>
-  inner_join(country_details) |>
-  inner_join(product_details$hs92) |>
-  filter(in_rankings) |>
-  select(year,
-         export_value,
-         export_rca,
-         location_code = country_iso3_code,
-         location_name = country_name_short,
-         hs_product_code = product_hs92_code,
-         hs_name_short_en = product_name_short)
-
-smooth_economic_complexity92 <- atlas_economic_complexity92 |>
-  arrange(year) |>
-  group_by(location_name, location_code, hs_name_short_en, hs_product_code) |>
-  mutate(export_value = rollmeanr(export_value, k = 3, fill = NA)) |>
-  ungroup() |>
-  mutate(export_value_p = sum(export_value), .by = c(hs_product_code, hs_name_short_en)) |>
-  mutate(export_value_c = sum(export_value), .by = c(location_code, location_name)) |>
-  mutate(export_value_cp = sum(export_value), .by = c(location_code, hs_product_code, location_name, hs_name_short_en)) |>
-  mutate(export_rca = (export_value_p/export_value)/(export_value_c/export_value_cp)) |>
-  select(year, export_value, export_rca, location_code, location_name, hs_product_code, hs_name_short_en) |>
-  filter(!is.na(export_value))
-
-
-atlas_economic_complexity12 <-  country_product$hs12 |>
-  inner_join(country_details) |>
-  inner_join(product_details$hs12) |>
-  filter(in_rankings) |>
-  select(year,
-         export_value,
-         export_rca,
-         location_code = country_iso3_code,
-         location_name = country_name_short,
-         hs_product_code = product_hs12_code,
-         hs_name_short_en = product_name_short)
-
-smooth_economic_complexity12 <- atlas_economic_complexity12 |>
-  arrange(year) |>
-  group_by(location_name, location_code, hs_name_short_en, hs_product_code) |>
-  mutate(export_value = rollmeanr(export_value, k = 3, fill = NA)) |>
-  ungroup() |>
-  mutate(export_value_p = sum(export_value), .by = c(hs_product_code, hs_name_short_en)) |>
-  mutate(export_value_c = sum(export_value), .by = c(location_code, location_name)) |>
-  mutate(export_value_cp = sum(export_value), .by = c(location_code, hs_product_code, location_name, hs_name_short_en)) |>
-  mutate(export_rca = (export_value_p/export_value)/(export_value_c/export_value_cp)) |>
-  select(year, export_value, export_rca, location_code, location_name, hs_product_code, hs_name_short_en) |>
-  filter(!is.na(export_value))
-
-atlas_economic_complexitysitc <- country_product$sitc |>
-  filter(country_id %in% rankings$country_id) |>
-  calculate_complexity_time_series(years = unique(country_product$sitc$year), region = "country_iso3_code", product = "product_sitc_code", value = "export_value")
-
-sitc_eci_long <- atlas_economic_complexitysitc |>
-  distinct(country_iso3_code, year, country_complexity_index) |>
-  mutate(eci_rank_sitc = rank(-country_complexity_index), .by = year)
-
-
-usethis::use_data(atlas_economic_complexity92, compress = "xz", overwrite = TRUE)
-usethis::use_data(smooth_economic_complexity92, compress = "xz", overwrite = TRUE)
-usethis::use_data(atlas_economic_complexitysitc, compress = "xz", overwrite = TRUE)
-usethis::use_data(atlas_economic_complexitysitc_long, compress = "xz", overwrite = TRUE)
-
-
-usethis::use_data(atlas_economic_complexity12, compress = "xz", overwrite = TRUE)
-usethis::use_data(smooth_economic_complexity12, compress = "xz", overwrite = TRUE)
-
-
-
-# Use hs92/sitc/hs12 rankings as given by the atlas data. Also calculate them using the smooth data.
-
-eci_ranking_smooth92 <- smooth_economic_complexity92 |>
-  calculate_complexity_time_series(years = unique(smooth_economic_complexity92$year), region = "location_code", product = "hs_product_code", value = "export_value") |>
-  distinct(year, location_code, location_name, country_complexity_index) |>
-  mutate(eci_rank_hs92_smooth = rank(-country_complexity_index), .by = year) |>
-  select(year, location_code, location_name, eci_hs92_smooth = country_complexity_index, eci_rank_hs92_smooth)
-
-eci_ranking_smooth12 <- smooth_economic_complexity12 |>
-  calculate_complexity_time_series(years = unique(smooth_economic_complexity12$year), region = "location_code", product = "hs_product_code", value = "export_value") |>
-  distinct(year, location_code, location_name, country_complexity_index) |>
-  mutate(eci_rank_hs12_smooth = rank(-country_complexity_index), .by = year) |>
-  select(year, location_code, location_name, eci_hs12_smooth = country_complexity_index,  eci_rank_hs12_smooth)
-
-eci_rankings <- rankings |>
-  distinct(year, location_code = country_iso3_code, eci_sitc, eci_rank_sitc, eci_hs92, eci_rank_hs92, eci_hs12, eci_rank_hs12) |>
-  inner_join(eci_ranking_smooth92) |>
-  inner_join(eci_ranking_smooth12)
-
-usethis::use_data(eci_rankings, overwrite = TRUE, compress = "xz")
-
-# Product Level Complexity Data
-
-atlas_complexity_product92 <- country_product$hs92 |>
-  distinct(year,
-           hs_product_code = product_hs92_code,
-           product_complexity_index = pci,
+  data |>
+    select(contains("code"),
+           year,
+           export_value,
+           export_rca,
+           import_value,
+           global_market_share,
+           distance,
            cog,
-           distance)
+           pci) |>
+    rename_with(\(x) str_remove(x, "hs[0-9]+_|sitc_"),
+                .cols = starts_with("product")) |>
+    mutate(classification = trade_codec,
+           digits = digits)
 
 
-atlas_complexity_product12 <- country_product$hs12 |>
-  distinct(year,
-           hs_product_code = product_hs12_code,
-           product_complexity_index = pci)
+}
 
-usethis::use_data(atlas_complexity_product92, overwrite = TRUE, compress = "xz")
-usethis::use_data(atlas_complexity_product12, overwrite = TRUE, compress = "xz")
+proximity <- function(data, classification) {
 
-atlas_complexity_country92 <- rankings |>
-  inner_join(country_year$hs92) |>
-  distinct(year, location_code = country_iso3_code, eci, export_value, eci_rank_hs92, growth_proj, coi, diversity)
+  classification <- str_split_1(classification, "_")
+  trade_codec <- classification[1]
+  digits <- classification[2]
+  year <- classification[3]
 
-atlas_complexity_country12 <- rankings |>
-  inner_join(country_year$hs12) |>
-  distinct(year, location_code = country_iso3_code, eci, export_value, eci_rank_hs12, growth_proj, coi, diversity)
+  data |>
+    pivot_longer(cols = -rowname) |>
+    mutate(classification = trade_codec,
+           digits = digits,
+           year = year)
+}
 
-usethis::use_data(atlas_complexity_country92, overwrite = TRUE, compress = "xz")
-usethis::use_data(atlas_complexity_country12, overwrite = TRUE, compress = "xz")
+country_product <- list(
+  hs92_4 = read_csv("data-raw/atlas_export_data/hs92/hs92_country_product_year_4.csv"),
+  hs12_4 = read_csv("data-raw/atlas_export_data/hs12/hs12_country_product_year_4.csv"),
+  hs22_4 = read_csv("data-raw/atlas_export_data/hs22/hs22_country_product_year_4.csv")
+)
 
+country_product_4 <- imap(.x = country_product,
+                          .f = \(x, y) atlas_trade_data(x, classification = y))  |>
+  list_rbind()
+
+atlas_raw_6 <- read_csv("data-raw/atlas_export_data/hs22/hs22_country_product_year_6.csv")
+
+country_product_6 <- calculate_complexity_time_series(atlas_raw_6,
+                                                      years = unique(atlas_raw_6$year),
+                                                      region = "country_iso3_code",
+                                                      product = "product_hs22_code",
+                                                      value = "export_value") |>
+  mutate(classification = "hs22",
+         digits = "6",
+         distance = 1 - density) |>
+  select(country_iso3_code,
+         product_code = product_hs22_code,
+         year,
+         export_value,
+         export_rca = rca,
+         import_value,
+         global_market_share,
+         distance,
+         cog,
+         pci = product_complexity_index,
+         classification,
+         digits)
+
+bind_rows(country_product_4, country_product_6) |>
+  group_by(classification, digits) |>
+  write_dataset(path = "data",
+                format = "parquet")
 
