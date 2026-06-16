@@ -34,6 +34,11 @@ state_economic_complexity <- economic_complexity |>
     by = join_by(year, location_code, country_complexity_index)
   ) |>
   filter(location_code %in% clean_state(1:8)) |>
-  rename(country_iso3_code = location_code)
+
+  rename(
+    country_iso3_code = location_code,
+    product_code = hs_product_code,
+    product_name = hs_name_short_en
+  )
 
 usethis::use_data(state_economic_complexity, compress = "xz", overwrite = TRUE)
